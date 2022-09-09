@@ -12,11 +12,19 @@ class MainController extends Controller
     //
     function login()
     {
-        return view('auth.login');
+        if (session()->has('LoggedUser')) {
+            return redirect('/admin/dashboard');
+        } else {
+            return view('auth.login');
+        }
     }
     function register()
     {
-        return view('auth.register');
+        if (session()->has('LoggedUser')) {
+            return redirect('/admin/dashboard');
+        } else {
+            return view('auth.login');
+        }
     }
     function save(Request $request)
     {
@@ -68,15 +76,22 @@ class MainController extends Controller
             }
         }
     }
-    function dashboard(){
-        //get info of loggeeduser by id 
-        //data is array 
-        $data = ['LoggedUserInfo'=>Admin::where('id','=', session('LoggedUser'))->first()];
-        return view('admin.dashboard', $data);
+    function dashboard()
+    {
+        if (session()->has('LoggedUser')) {
+            //get info of loggeeduser by id 
+            //data is array 
+            $data = ['LoggedUserInfo' => Admin::where('id', '=', session('LoggedUser'))->first()];
+            return view('admin.dashboard', $data);
+        }
+        else{
+            return redirect('auth/login')->with('fail','You must be logged in');
+        }
     }
 
-    function logout(){
-        if(session()->has('LoggedUser')){
+    function logout()
+    {
+        if (session()->has('LoggedUser')) {
             //destroy session
             session()->pull('LoggedUser');
             return redirect('/auth/login');
