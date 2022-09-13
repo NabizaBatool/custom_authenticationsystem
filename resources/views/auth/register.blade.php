@@ -41,12 +41,12 @@
                     @csrf
                     <div class="form-group">
                         <label>Name</label>
-                        <input type="text" class="form-control" name="name" placeholder="Enter name">
+                        <input type="text" class="form-control" name="name" placeholder="Enter name" value="{{old('name')}}">
                         <span class="text-danger">@error('name'){{ $message }} @enderror</span>
                     </div>
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="text" class="form-control" name="email" placeholder="Enter email address">
+                        <input type="text" class="form-control" name="email" placeholder="Enter email address" value="{{old('email')}}">
                         <span class="text-danger">@error('email'){{ $message }} @enderror</span>
                     </div>
                     <div class="form-group">
@@ -56,7 +56,7 @@
                     </div>
                     <div class="form-group">
                         <label>Confirm Password</label>
-                        <input type="password" class="form-control" name="confirmpassword" placeholder="Password confirmation">
+                        <input type="password" class="form-control" name="confirmpassword" placeholder="Password confirmation" >
                     </div>
                     <button type="submit" class="btn btn-block btn-primary">Sign Up</button>
                     <br>
