@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forget Password</title>
+    <title>Login</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <style>
@@ -29,22 +29,33 @@
             <div class="col-md-4 col-md-offset-4">
                 <h4>Reset Password | Custom Auth</h4>
                 <hr>
-                <form action="{{ route('send-mail')}}" method="post">
+                <form action="{{ route('reset.password.post') }}" method="post">
                     @if(Session::get('fail'))
                     <div class="alert alert-danger">
                         {{ Session::get('fail') }}
                     </div>
                     @endif
+
                     @csrf
-                   
                     <div class="form-group">
                         <label>Email</label>
                         <input type="text" class="form-control" name="email" placeholder="Enter email address" value="{{old('email')}}">
                         <span class="text-danger">@error('email'){{ $message }} @enderror</span>
                     </div>
-                    <button type="submit" class="btn btn-block btn-primary">Reset</button>
-                    <br>
+                    <input type="hidden" class="form-control" name="token" value="{{ $token }}">
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" class="form-control" name="newpassword" placeholder="Enter new password">
+                        <span class="text-danger">@error('newpassword'){{ $message }} @enderror</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" class="form-control" name="newpasswordconfirm" placeholder="Enter new password again">
+                       
+                    </div>
+                    <button type="submit" class="btn btn-block btn-primary">Update password</button>
                 </form>
+               
             </div>
         </div>
     </div>

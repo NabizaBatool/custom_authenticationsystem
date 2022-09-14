@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Http\Requests\AdminRequest;
 use App\Http\Requests\LoginRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class MainController extends Controller
 {
@@ -86,11 +89,49 @@ class MainController extends Controller
     }
 
 
-    function resetEmail(Request $request , $token)
+    function resetEmail(Request $request)
     {
-        $request->validate(['token' => 'required'  , 'email' => 'required|email' 
+        $request->validate([
+            'email' => 'required|email',
         ]);
-        return view('welcome' , ['token'=> $token]);
-        
+        $token = Str::random(64);
+        DB::table('password_resets')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => Carbon::now()
+        ]);
+        $details = [
+            'title' => 'Mail from Auth_system',
+            'body' => 'This is for testing email using smtp',
+            'token' => $token
+        ];
+        Mail::to($request->email)->send(new \App\Mail\MyTestMail($details));
+        dd("Email is Sent, check it");
+    }
+    
+
+
+    function resetpasswordform($token)
+    {
+        return view('auth.resetpassform', ['token' => $token]);
+    }
+
+    function submitresetpassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users',
+            'newpassword' => 'min:6|required_with:newpasswordconfirm|same:newpasswordconfirm',
+            'newpasswordconfirm' => 'required|min:6'
+        ]);
+
+        $updatePassword = DB::table('password_resets')->where([
+            'token' => $request->token
+        ])->first();
+        if (!$updatePassword) {
+            return back()->withInput()->with('fail', 'Reset Link has expired !');
+        }
+        User::where('email', '=', $request->email)->first()->update(['password' => Hash::make($request->newpassword)]);
+        DB::table('password_resets')->where(['token' => $request->token])->delete();
+        return redirect('/auth/login')->with('success', 'your password is updated');
     }
 }
